@@ -18,9 +18,11 @@ import java.util.List;
 public class BaseCategory3ServiceImpl extends ServiceImpl<BaseCategory3Mapper, BaseCategory3>
     implements BaseCategory3Service{
 
+
+
     @Override
-    public List<BaseCategory3> getCategoryChild(String c2Id) {
-        return baseMapper.selectList(new LambdaQueryWrapper<BaseCategory3>().eq(BaseCategory3::getCategory2Id,c2Id));
+    public List<BaseCategory3> getCategory2Child(Long c2id) {
+        return baseMapper.selectList(new LambdaQueryWrapper<BaseCategory3>().eq(BaseCategory3::getCategory2Id,c2id));
     }
 }
 

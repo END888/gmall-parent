@@ -19,7 +19,7 @@ public class BaseCategory2ServiceImpl extends ServiceImpl<BaseCategory2Mapper, B
     implements BaseCategory2Service{
 
     @Override
-    public List<BaseCategory2> getCategoryChild(String c1id) {
+    public List<BaseCategory2> getCategory1Child(Long c1id) {
         return baseMapper.selectList(new LambdaQueryWrapper<BaseCategory2>().eq(BaseCategory2::getCategory1Id,c1id));
     }
 }
