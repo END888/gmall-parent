@@ -9,6 +9,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 品牌API
  */
@@ -88,5 +90,16 @@ public class BaseTrademarkController {
     public Result remove(@PathVariable Long id){
         baseTrademarkService.remove(new LambdaQueryWrapper<BaseTrademark>().eq(BaseTrademark::getId,id));
         return Result.ok();
+    }
+
+
+    /**
+     * 获取所有品牌
+     * @return
+     */
+    @GetMapping("/baseTrademark/getTrademarkList")
+    public Result getTrademarkList(){
+        List<BaseTrademark> list = baseTrademarkService.list();
+        return Result.ok(list);
     }
 }

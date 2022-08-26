@@ -1,6 +1,9 @@
 package com.atguigu.gmall.product.controller;
 
 import com.atguigu.gmall.common.result.Result;
+import com.atguigu.gmall.product.service.FileUploadService;
+import io.swagger.annotations.Api;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,9 +12,13 @@ import java.util.HashMap;
 /**
  * 文件上传
  */
+@Api("文件上传控制器")
 @RestController
 @RequestMapping("/admin/product")
 public class FileUploadController {
+
+    @Autowired
+    FileUploadService fileUploadService;
 
     /**
      * 文件上传功能
@@ -32,10 +39,10 @@ public class FileUploadController {
      * @return
      */
     @PostMapping("/fileUpload")
-    public Result fileUpload(@RequestPart("file")MultipartFile file){
-
+    public Result fileUpload(@RequestPart("file")MultipartFile file) throws Exception {
+        String url = fileUploadService.upload(file);
         // TODO 文件上传，怎么上传到 Minio?
-        return Result.ok();
+        return Result.ok(url);
     }
 
     @PostMapping("/register")

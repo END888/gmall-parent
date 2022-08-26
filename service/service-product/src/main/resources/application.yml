@@ -15,3 +15,12 @@ spring:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 自定义配置
+app:
+  minio:
+    ak: admin
+    sk: admin123456
+    bucket-name: gmall
+    endpoint: http://192.168.200.100:9000
+

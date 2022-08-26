@@ -10,7 +10,8 @@
         <result property="categoryId" column="category_id" jdbcType="BIGINT"/>
         <result property="categoryLevel" column="category_level" jdbcType="INTEGER"/>
     </resultMap>
-    <resultMap id="getBaseAttrInfoByCategoryIdMap" type="com.atguigu.gmall.model.product.BaseAttrInfo" autoMapping="true">
+    <resultMap id="getBaseAttrInfoByCategoryIdMap" type="com.atguigu.gmall.model.product.BaseAttrInfo"
+               autoMapping="true">
         <id property="id" column="id"/>
         <collection property="attrValueList" ofType="com.atguigu.gmall.model.product.BaseAttrValue" autoMapping="true">
             <id property="id" column="vid"/>
@@ -21,19 +22,41 @@
         id,attr_name,category_id,
         category_level
     </sql>
+    <!--    <select id="getBaseAttrInfoByCategoryId" resultMap="getBaseAttrInfoByCategoryIdMap">-->
+    <!--        select bai.id,-->
+    <!--               attr_name,-->
+    <!--               category_id,-->
+    <!--               category_level,-->
+    <!--               bav.id vid,-->
+    <!--               value_name,-->
+    <!--               attr_id-->
+    <!--        from base_attr_info bai-->
+    <!--                 left join base_attr_value bav on bai.id = bav.attr_id-->
+    <!--        where (category_id = #{category1Id} and category_level = 1)-->
+    <!--        or (category_id = #{category2Id} and category_level = 2)-->
+    <!--        or (category_id = #{category3Id} and category_level = 3)-->
+    <!--    </select>-->
     <select id="getBaseAttrInfoByCategoryId" resultMap="getBaseAttrInfoByCategoryIdMap">
         select bai.id,
-               attr_name,
-               category_id,
-               category_level,
-               bav.id vid,
-               value_name,
-               attr_id
+        attr_name,
+        category_id,
+        category_level,
+        bav.id vid,
+        value_name,
+        attr_id
         from base_attr_info bai
-                 left join base_attr_value bav on bai.id = bav.attr_id
-        where (category_id = #{category1Id} and category_level = 1)
-        or (category_id = #{category2Id} and category_level = 2)
-        or (category_id = #{category3Id} and category_level = 3)
+        left join base_attr_value bav on bai.id = bav.attr_id
+        <where>
+            <if test="category1Id != null">
+                (category_id = #{category1Id} and category_level = 1) or
+            </if>
+            <if test="category2Id != null">
+                (category_id = #{category2Id} and category_level = 2) or
+            </if>
+            <if test="category3Id != null">
+                (category_id = #{category3Id} and category_level = 3)
+            </if>
+#         </where>
     </select>
 
 </mapper>
