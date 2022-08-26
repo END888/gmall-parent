@@ -1,0 +1,52 @@
+{
+  "id": null,
+  "spuId": 29,
+  "price": "4058",
+  "skuName": "华为 P50 E 5000万超感光原色影像 超级变焦单元 手机 雪域白 全网通4G(8GB+256GB)",
+  "weight": "0.23",
+  "skuDesc": "主体\n机型\n华为 P50E\n入网型号\nABR-AL60\n基本信息\n机身尺寸\n宽73.8mm；长156.5mm；厚7.92mm\nCPU型号\n以官网信息为准\n机身重量\n181g\n屏幕\n屏幕刷新率\n90Hz\n屏幕材质\n以官网信息为准\n屏幕分辨率\n2700 x 1224\n屏幕尺寸\n6.5英寸\n屏幕特色\n无\n电池信息\n无线充电\n不支持\n操作系统\n系统\nHarmonyOS\n网络支持\n双卡机类型\n双卡双待\n5G网络\n不支持\n3G/2G网络\n以官网信息为准\nSIM卡数量\n2个\nSIM卡类型\nNano SIM\n4G网络\n4G FDD-LTE；4G TD-LTE\n数据接口\n充电接口\nType-C\n数据接口\nWIFI；蓝牙；NFC；OTG接口\n耳机接口\nType-C\n手机特性\n生物识别\n人脸识别\n摄像头\n前摄主像素\n1300万像素\n后摄2-超广角像素\n1300万像素\n后摄主像素\n5000万像素\n后摄3-tele像素\n1200万像素\n包装清单\n暂无",
+  "category3Id": 61,
+  "skuAttrValueList": [
+    {
+      "attrId": "1",
+      "valueId": "5"
+    },
+    {
+      "attrId": "2",
+      "valueId": "12"
+    },
+    {
+      "attrId": "3",
+      "valueId": "19"
+    },
+    {
+      "attrId": "4",
+      "valueId": "26"
+    },
+    {
+      "attrId": "5",
+      "valueId": "44"
+    },
+    {
+      "attrId": "11",
+      "valueId": "61"
+    }
+  ],
+  "skuSaleAttrValueList": [
+    {
+      "saleAttrValueId": "118",
+      "saleAttrValueName": "白色",
+      "baseSaleAttrId": "1",
+      "saleAttrName": "选择颜色"
+    },
+    {
+      "saleAttrValueId": "109",
+      "saleAttrValueName": "8G+256G",
+      "baseSaleAttrId": "2",
+      "saleAttrName": "选择版本"
+    }
+  ],
+  "skuImageList": [],
+  "skuDefaultImg": null,
+  "tmId": 2
+}

@@ -31,7 +31,7 @@ public class BaseAttrInfoServiceImpl extends ServiceImpl<BaseAttrInfoMapper, Bas
     @Override
     public List<BaseAttrInfo> getBaseAttrInfoByCategoryId(Long category1Id, Long category2Id, Long category3Id) {
         // 查询指定分类下的所有属性名和值
-        return baseMapper.getBaseAttrInfoByCategoryId(category1Id,category2Id,category3Id);
+        return baseMapper.getAttrInfoAndValueByCategoryId(category1Id,category2Id,category3Id);
     }
 
     /**

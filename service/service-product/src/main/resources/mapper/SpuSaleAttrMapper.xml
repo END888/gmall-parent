@@ -12,23 +12,54 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,spu_id,base_sale_attr_id,
+        id
+        ,spu_id,base_sale_attr_id,
         sale_attr_name
     </sql>
-    <!--销售属性名和值的封装规则-->
-    <resultMap id="SaleAttrAndValueRM" type="com.atguigu.gmall.model.product.SpuSaleAttr" autoMapping="true">
+
+
+    <!--    销售属性名和值的封装规则-->
+    <resultMap id="SaleAttrNameAndValueRM"
+               type="com.atguigu.gmall.model.product.SpuSaleAttr"
+               autoMapping="true">
         <id column="id" property="id"/>
-        <collection property="spuSaleAttrValueList" ofType="com.atguigu.gmall.model.product.SpuSaleAttrValue"
+        <collection property="spuSaleAttrValueList"
+                    ofType="com.atguigu.gmall.model.product.SpuSaleAttrValue"
                     autoMapping="true">
             <id column="vid" property="id"/>
         </collection>
     </resultMap>
-    <select id="getSaleAttrAndValueBySpuId" resultMap="SaleAttrAndValueRM">
+
+<!--    查询某个spu定义的所有销售属性名和值-->
+    <select id="getSaleAttrAndValueBySpuId"
+            resultMap="SaleAttrNameAndValueRM">
         select ssa.*,
                ssav.id vid,
                ssav.sale_attr_value_name
         from spu_sale_attr ssa
-                 left join spu_sale_attr_value ssav on ssa.base_sale_attr_id = ssav.base_sale_attr_id
-        where ssa.spu_id = #{spuId}
+                 left join spu_sale_attr_value ssav
+                           on ssa.spu_id = ssav.spu_id and
+                              ssa.base_sale_attr_id = ssav.base_sale_attr_id
+        where ssa.spu_id = #{spuId} order by ssa.id,ssav.id
+    </select>
+
+
+
+<!--查询某个sku对应的spu定义的所有销售属性名和值，并标记出当前sku是那种组合    -->
+
+    <select id="getSaleAttrAndValueMarkSku"
+        resultMap="SaleAttrNameAndValueRM">
+        select ssa.*,
+               ssav.id  vid,
+               ssav.sale_attr_value_name,
+               IF(skuv.sale_attr_value_id  IS NULL,'0','1') as is_checked
+        from spu_sale_attr ssa
+                 left join spu_sale_attr_value ssav
+                           on ssa.spu_id = ssav.spu_id
+                               and ssa.base_sale_attr_id=ssav.base_sale_attr_id
+                 left join sku_sale_attr_value skuv
+                           on ssav.id = skuv.sale_attr_value_id and skuv.sku_id=#{skuId}
+        where ssa.spu_id=#{spuId}
+        order by ssa.id,ssav.id
     </select>
 </mapper>
