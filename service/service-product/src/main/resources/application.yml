@@ -23,4 +23,7 @@ app:
     sk: admin123456
     bucket-name: gmall
     endpoint: http://192.168.200.100:9000
+  thread-pool:
+    core: 4
+    max: 8
 
