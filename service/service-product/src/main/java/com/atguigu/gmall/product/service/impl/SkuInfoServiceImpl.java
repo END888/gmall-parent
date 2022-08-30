@@ -141,6 +141,16 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
         return imageList;
     }
 
+    @Override
+    public List<Long> findAllSkuId() {
+        // 100w 商品
+        // 100w * 8byte = 800w 字节 = 8mb。
+        //1亿数据，所有id从数据库传给微服务  800mb的数据量
+        //分页查询。分批次查询。
+
+        return skuInfoMapper.getAllSkuId();
+    }
+
 }
 
 

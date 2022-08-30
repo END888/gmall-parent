@@ -38,12 +38,14 @@ public class SkuDetailApiController {
      * @param skuId
      * @return
      */
-//    @GetMapping("/skudetail/{skuId}")
-//    public Result<SkuDetailTo> getSkuDetail(@PathVariable Long skuId){
-//        // 准备查询所有需要的数据
-//        SkuDetailTo skuDetailTo = skuInfoService.getSkuDetail(skuId);
-//        return Result.ok(skuDetailTo);
-//    }
+    /**
+    @GetMapping("/skudetail/{skuId}")
+    public Result<SkuDetailTo> getSkuDetail(@PathVariable Long skuId){
+        // 准备查询所有需要的数据
+        SkuDetailTo skuDetailTo = skuInfoService.getSkuDetail(skuId);
+        return Result.ok(skuDetailTo);
+    }
+    */
 
     /**
      * 查询sku的基本信息
