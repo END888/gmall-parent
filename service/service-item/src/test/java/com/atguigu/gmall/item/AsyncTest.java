@@ -41,7 +41,7 @@ public class AsyncTest {
         }, executor);
 
         // 等到所有的任务都执行完成后再继续往下执行
-//        CompletableFuture.allOf(future1,future2,future3).join();
+        CompletableFuture.allOf(future1,future2,future3).join();
 
         // 只要有一个任务执行完成就继续执行，没有执行完的也以异步的方式继续执行
 //        CompletableFuture.anyOf(future1,future2,future3).join();

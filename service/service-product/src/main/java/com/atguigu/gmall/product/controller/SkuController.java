@@ -4,6 +4,7 @@ package com.atguigu.gmall.product.controller;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.product.service.SkuInfoService;
+import com.atguigu.starter.cache.servie.CacheOpsService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,9 @@ public class SkuController {
 
     @Autowired
     SkuInfoService skuInfoService;
+
+    @Autowired
+    CacheOpsService cacheOpsService;
 
     /**
      * sku 分页查询
@@ -65,5 +69,14 @@ public class SkuController {
     public Result onSale(@PathVariable("skuId")Long skuId){
         skuInfoService.onSale(skuId);
         return Result.ok();
+    }
+
+    /**
+     * 修改 SKU 信息
+     * @param skuInfo
+     */
+    public void updateSkuInfo(SkuInfo skuInfo){
+//        skuInfoService.updateSkuInfo(skuInfo);
+//        cacheOpsService.delay2Delete(String.valueOf(skuInfo.getId()));
     }
 }

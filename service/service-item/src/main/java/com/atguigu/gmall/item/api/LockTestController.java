@@ -110,7 +110,7 @@ public class LockTestController {
         // waitTime：最多等多久的锁
         // leaseTime：锁的释放时间
         // 10s 以内等到锁就设置 20s 过期时间，等不到锁则 10s 后返回 false
-//        boolean b2 = lock.tryLock(10, 20, TimeUnit.SECONDS);
+        boolean b2 = lock.tryLock(10, 20, TimeUnit.SECONDS);
 
         System.out.println("得到锁");
         // 执行业务逻辑
