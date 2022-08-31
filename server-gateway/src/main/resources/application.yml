@@ -33,5 +33,10 @@ spring:
           predicates:
             - Host=**.gmall.com
 
+        - id: service-item
+          uri: lb://service-item
+          predicates:
+            - Path=/lock/incr
+
 
 

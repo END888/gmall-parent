@@ -1,7 +1,7 @@
 package com.atguigu.gmall.product.api;
 
-import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.common.result.Result;
+import com.atguigu.starter.cache.constant.SysRedisConst;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;

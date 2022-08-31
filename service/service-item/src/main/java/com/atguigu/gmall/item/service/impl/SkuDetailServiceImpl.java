@@ -1,6 +1,5 @@
 package com.atguigu.gmall.item.service.impl;
 
-import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.item.cache.CacheOpsService;
 import com.atguigu.gmall.item.feign.SkuDetailFeignClient;
@@ -10,6 +9,8 @@ import com.atguigu.gmall.model.product.SkuInfo;
 import com.atguigu.gmall.model.product.SpuSaleAttr;
 import com.atguigu.gmall.model.to.CategoryViewTo;
 import com.atguigu.gmall.model.to.SkuDetailTo;
+import com.atguigu.starter.cache.annotation.GmallCache;
+import com.atguigu.starter.cache.constant.SysRedisConst;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -17,8 +18,12 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 @Service
@@ -38,6 +43,11 @@ public class SkuDetailServiceImpl implements SkuDetailService {
 
     @Autowired
     CacheOpsService cacheOpsService;
+
+    // 每个 skuId、关联一把自己的锁
+    Map<Long, ReentrantLock> lockPool = new ConcurrentHashMap<>();
+    // 锁的粒度太大，把无关的人都锁住了
+    ReentrantLock lock = new ReentrantLock(); // 锁的住
 
     /**
      *  异步实际上是： 空间换时间；  new Thread()
@@ -121,11 +131,12 @@ public class SkuDetailServiceImpl implements SkuDetailService {
 
     /**
      * 使用缓存2.0
+     * 切入点表达式怎么写？
+     * execution(* com.atguigu.gmall.item.**.*(..))
      * @param skuId
      * @return
      */
-    @Override
-    public SkuDetailTo getSkuDetail(Long skuId) {
+    public SkuDetailTo getSkuDetailWithCache(Long skuId) {
         String cacheKey = SysRedisConst.SKU_INFO_PREFIX + skuId;
         // 1、先查缓存
         SkuDetailTo cacheData = cacheOpsService.getCacheData(cacheKey,SkuDetailTo.class);
@@ -152,7 +163,31 @@ public class SkuDetailServiceImpl implements SkuDetailService {
                 return fromRpc;
             }
         }
+        // 9、没有获取到锁
+        try {
+            TimeUnit.SECONDS.sleep(1);
+            return cacheOpsService.getCacheData(cacheKey,SkuDetailTo.class);
+        } catch (InterruptedException e){
+            e.printStackTrace();
+        }
+        // 缓存中有，直接返回
         return cacheData;
+    }
+
+    /**
+     * 表达式中的 params 代表方法中的所有参数列表
+     * @param skuId
+     * @return
+     */
+    @GmallCache(
+            cacheKey =SysRedisConst.SKU_INFO_PREFIX+"#{#params[0]}",
+            bloomName = SysRedisConst.BLOOM_SKUID,
+            bloomValue = "#{#params[0]}",
+            lockName = SysRedisConst.LOCK_SKU_DETAIL+"#{#params[0]}"
+    )
+    @Override
+    public SkuDetailTo getSkuDetail(Long skuId) {
+        return getSkuDetailFromRpc(skuId);
     }
 
     /**

@@ -1,7 +1,7 @@
 package com.atguigu.gmall.product.init;
 
-import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.product.service.SkuInfoService;
+import com.atguigu.starter.cache.constant.SysRedisConst;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RedissonClient;
@@ -27,6 +27,9 @@ public class SkuIdBloomInitService {
     // TODO 布隆只能增，不能删除商品，如果真的数据库删除了商品，布隆怎么办？
     // TODO 布隆重建。
 
+    /**
+     * 项目一启动就运行
+     */
     @PostConstruct // 当前组件对象创建成功以后
     public void initSkuBloom(){
         log.info("布隆初始化正在进行...");

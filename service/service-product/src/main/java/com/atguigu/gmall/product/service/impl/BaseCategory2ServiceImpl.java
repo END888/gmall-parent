@@ -4,6 +4,8 @@ import com.atguigu.gmall.model.product.BaseCategory2;
 import com.atguigu.gmall.model.to.CategoryTreeTo;
 import com.atguigu.gmall.product.mapper.BaseCategory2Mapper;
 import com.atguigu.gmall.product.service.BaseCategory2Service;
+import com.atguigu.starter.cache.annotation.GmallCache;
+import com.atguigu.starter.cache.constant.SysRedisConst;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,11 @@ public class BaseCategory2ServiceImpl extends ServiceImpl<BaseCategory2Mapper, B
         return baseMapper.selectList(new LambdaQueryWrapper<BaseCategory2>().eq(BaseCategory2::getCategory1Id,c1id));
     }
 
+    /**
+     * 对三级分类的数据进行缓存
+     * @return
+     */
+    @GmallCache(cacheKey = SysRedisConst.CACHE_CATEGORYS) //categorys
     @Override
     public List<CategoryTreeTo> getAllCategoryWithTree() {
         return baseCategory2Mapper.getAllCategoryWithTree();
