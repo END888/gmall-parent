@@ -82,8 +82,9 @@ public class CacheAspect {
                 if (lock){
                     // 6、获取到锁，开始回源
                     result = joinPoint.proceed(joinPoint.getArgs());
+                    long ttl = determinTtl(joinPoint);
                     // 7、调用成功，重新保存到缓存
-                    cacheOpsService.saveData(cacheKey,result);
+                    cacheOpsService.saveData(cacheKey,result,ttl);
                     return result;
                 }else {
                     TimeUnit.SECONDS.sleep(1);
@@ -95,6 +96,17 @@ public class CacheAspect {
         }
         // 缓存中有直接返回
         return cacheData;
+    }
+
+    private long determinTtl(ProceedingJoinPoint joinPoint) {
+        // 1、拿到目标方法上的 @GmallCache 注解
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
+
+        // 2、拿到注解
+        GmallCache declaredAnnotation = method.getDeclaredAnnotation(GmallCache.class);
+        long ttl = declaredAnnotation.ttl();
+        return ttl;
     }
 
     /**

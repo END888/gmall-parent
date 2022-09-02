@@ -80,4 +80,12 @@ public interface CacheOpsService {
      * @param cacheKey
      */
     void delay2Delete(String cacheKey);
+
+    /**
+     * 以秒
+     * @param cacheKey
+     * @param fromRpc
+     * @param dataTtl
+     */
+    void saveData(String cacheKey,Object fromRpc,Long dataTtl);
 }

@@ -183,4 +183,21 @@ public class CacheOpsServiceImpl implements CacheOpsService {
             redisTemplate.delete(cacheKey);
         },5,TimeUnit.SECONDS);
     }
+
+    @Override
+    public void saveData(String cacheKey, Object fromRpc, Long dataTtl) {
+        if (fromRpc == null){
+            // null 值缓存短一点时间
+            redisTemplate.opsForValue().set(cacheKey,
+                    SysRedisConst.NULL_VAL,
+                    SysRedisConst.NULL_VAL_TTL,
+                    TimeUnit.SECONDS);
+        }else {
+            String str = Jsons.toStr(fromRpc);
+            redisTemplate.opsForValue().set(cacheKey,
+                    str,
+                    dataTtl,
+                    TimeUnit.SECONDS);
+        }
+    }
 }

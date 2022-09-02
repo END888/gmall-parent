@@ -19,4 +19,5 @@ public @interface GmallCache {
 
     String lockName() default ""; // 传入精确锁就用精确的，否则用全局默认的
 
+    long ttl() default 60*30L;
 }
