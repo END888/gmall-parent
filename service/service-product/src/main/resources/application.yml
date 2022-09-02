@@ -1,7 +1,11 @@
 server:
   port: 7000
+  tomcat:
+    max-connections: 200 #我们的内存支持不了8000连接
 
 spring:
+  profiles:
+    include: sharding #包含的文件不用区分激活的profile
   redis:
     host: 192.168.200.100
     password: Lfy123456
