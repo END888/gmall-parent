@@ -1,7 +1,7 @@
 package com.atguigu.gmall.item.service.impl;
 
 import com.atguigu.gmall.common.result.Result;
-import com.atguigu.gmall.item.feign.SkuDetailFeignClient;
+import com.atguigu.gmall.feign.product.SkuProductFeignClient;
 import com.atguigu.gmall.item.service.SkuDetailService;
 import com.atguigu.gmall.model.product.SkuImage;
 import com.atguigu.gmall.model.product.SkuInfo;
@@ -30,7 +30,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SkuDetailServiceImpl implements SkuDetailService {
 
     @Autowired
-    SkuDetailFeignClient skuDetailFeignClient;
+    SkuProductFeignClient skuDetailFeignClient;
 
     @Autowired
     StringRedisTemplate redisTemplate;
