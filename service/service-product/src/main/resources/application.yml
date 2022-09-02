@@ -6,13 +6,13 @@ server:
 spring:
   profiles:
     include: sharding #包含的文件不用区分激活的profile
-  redis:
-    host: 192.168.200.100
-    password: Lfy123456
-  zipkin:
-    base-url: http://192.168.200.100:9411
-    sender:
-      type: web
+#  redis:
+#    host: 192.168.200.100
+#    password: Lfy123456
+#  zipkin:
+#    base-url: http://192.168.200.100:9411
+#    sender:
+#      type: web
   datasource:
     url: jdbc:mysql://192.168.200.100:3306/gmall_product
     username: root

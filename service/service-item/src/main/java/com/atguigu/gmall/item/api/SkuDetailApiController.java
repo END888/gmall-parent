@@ -21,6 +21,12 @@ public class SkuDetailApiController {
 
     @GetMapping("/skudetail/{skuId}")
     public Result<SkuDetailTo> getSkuDetail(@PathVariable("skuId")Long skuId){
+//        System.out.println("重试...");
+//        try {
+//            TimeUnit.SECONDS.sleep(10);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         //商品的详情
         SkuDetailTo skuDetailTo = detailService.getSkuDetail(skuId);
 

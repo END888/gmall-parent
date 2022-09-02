@@ -2,14 +2,25 @@ server:
   port: 7001
 
 spring:
+  # 如果在 @FeignClient 中配置了多个调用的服务名相同，会启动失败；以下配置可以允许 bean 的定义信息覆盖
   main:
     allow-bean-definition-overriding: true
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-  zipkin:
-    base-url: http://192.168.200.100:9411/
-    sender:
-      type: web
+#  zipkin:
+#    base-url: http://192.168.200.100:9411/
+#    sender:
+#      type: web
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
+
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 1000
+        readTimeout: 5000
+        retryer: com.atguigu.gmall.common.retry.MyRetry
+# 如果什么都不配置的话，浏览器默认会进行一次重试，算上第一次发的请求，总共会发两次请求
