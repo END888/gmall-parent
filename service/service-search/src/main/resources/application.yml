@@ -1,0 +1,12 @@
+server:
+  port: 9000
+
+# spring.elasticsearch.rest
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+  elasticsearch:
+    rest:
+      uris:
+        - http://192.168.200.100:9200
