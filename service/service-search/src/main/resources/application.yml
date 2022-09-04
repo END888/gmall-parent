@@ -10,3 +10,12 @@ spring:
     rest:
       uris:
         - http://192.168.200.100:9200
+
+
+#dsl:
+#  aaa: findhaHAdadada
+#  ALL --- TRACE --- DEBUG --- INFO --WARN -- ERROR --OFF
+logging:
+  level:
+    tracer: trace  #打开追踪器
+    org.elasticsearch: trace
