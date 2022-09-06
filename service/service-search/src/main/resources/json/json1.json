@@ -1,0 +1,145 @@
+{
+  "from": 0,
+  "size": 1,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "title": {
+              "query": "华为",
+              "operator": "OR",
+              "prefix_length": 0,
+              "max_expansions": 50,
+              "fuzzy_transpositions": true,
+              "lenient": false,
+              "zero_terms_query": "NONE",
+              "auto_generate_synonyms_phrase_query": true,
+              "boost": 1.0
+            }
+          }
+        },
+        {
+          "term": {
+            "category1Id": {
+              "value": 2,
+              "boost": 1.0
+            }
+          }
+        },
+        {
+          "term": {
+            "category2Id": {
+              "value": 13,
+              "boost": 1.0
+            }
+          }
+        },
+        {
+          "term": {
+            "category3Id": {
+              "value": 61,
+              "boost": 1.0
+            }
+          }
+        },
+        {
+          "range": {
+            "price": {
+              "from": 4000,
+              "to": null,
+              "include_lower": false,
+              "include_upper": true,
+              "boost": 1.0
+            }
+          }
+        },
+        {
+          "nested": {
+            "query": {
+              "bool": {
+                "must": [
+                  {
+                    "term": {
+                      "attrs.attrId": {
+                        "value": 4,
+                        "boost": 1.0
+                      }
+                    }
+                  },
+                  {
+                    "term": {
+                      "attrs.attrValue": {
+                        "value": "128GB",
+                        "boost": 1.0
+                      }
+                    }
+                  }
+                ],
+                "adjust_pure_negative": true,
+                "boost": 1.0
+              }
+            },
+            "path": "attrs",
+            "ignore_unmapped": false,
+            "score_mode": "none",
+            "boost": 1.0
+          }
+        },
+        {
+          "nested": {
+            "query": {
+              "bool": {
+                "must": [
+                  {
+                    "term": {
+                      "attrs.attrId": {
+                        "value": 5,
+                        "boost": 1.0
+                      }
+                    }
+                  },
+                  {
+                    "term": {
+                      "attrs.attrValue": {
+                        "value": "麒麟990",
+                        "boost": 1.0
+                      }
+                    }
+                  }
+                ],
+                "adjust_pure_negative": true,
+                "boost": 1.0
+              }
+            },
+            "path": "attrs",
+            "ignore_unmapped": false,
+            "score_mode": "none",
+            "boost": 1.0
+          }
+        }
+      ],
+      "adjust_pure_negative": true,
+      "boost": 1.0
+    }
+  },
+  "version": true,
+  "sort": [
+    {
+      "price": {
+        "order": "asc"
+      }
+    }
+  ],
+  "highlight": {
+    "pre_tags": [
+      "<span style='color:red'>"
+    ],
+    "post_tags": [
+      "</span>"
+    ],
+    "fields": {
+      "title": {}
+    }
+  }
+}'
