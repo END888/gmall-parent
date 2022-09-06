@@ -30,6 +30,8 @@ public class SkuDetailApiController {
         //商品的详情
         SkuDetailTo skuDetailTo = detailService.getSkuDetail(skuId);
 
+        // 更新热度分，攒一批更新一次 ES（100）
+        detailService.updateHotScore(skuId);
         return Result.ok(skuDetailTo);
     }
 }
