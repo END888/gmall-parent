@@ -2,9 +2,17 @@ package com.atguigu.gmall.search;
 
 import com.atguigu.gmall.search.bean.Person;
 import com.atguigu.gmall.search.repository.PersonRepository;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +22,9 @@ public class SearchMainApplicationTest {
 
     @Autowired
     PersonRepository personRepository;
+
+    @Autowired
+    ElasticsearchRestTemplate esRestTemplate;
 
     @Test
     void test01(){
@@ -86,4 +97,118 @@ public class SearchMainApplicationTest {
         List<Person> list4 = personRepository.findAgeGreaterThanAndAddressOrIDThan(20, "西安", 1L);
         list4.forEach(System.out::println);
     }
+
+
+    @Test
+    void test03(){
+        NativeSearchQuery query = new NativeSearchQuery(QueryBuilders.matchQuery("address","西安市"));
+        SearchHits<Person> search = esRestTemplate.search(query,Person.class, IndexCoordinates.of("person"));
+        List<SearchHit<Person>> searchHits = search.getSearchHits();
+        searchHits.forEach(r->{
+            Person person = r.getContent();
+            System.out.println(person);
+        });
+    }
+
+    /**
+     * 查询地址在西安市的人
+     */
+    @Test
+    void test04(){
+        // 1、构建 query
+        MatchQueryBuilder query = QueryBuilders.matchQuery("address", "西安市");
+        // 2、利用 esTemplate 进行查找，并获取查找结果
+        SearchHits<Person> searchHits = esRestTemplate
+                .search(new NativeSearchQuery(query), Person.class, IndexCoordinates.of("person"));
+        // 3、获取集合列表
+        List<SearchHit<Person>> hitList = searchHits.getSearchHits();
+        // 4、获取集合元素个数
+        long totalHits = searchHits.getTotalHits();
+
+        // 5、获取集合元素
+        for (SearchHit<Person> personSearchHit : hitList) {
+
+            Person person = personSearchHit.getContent();
+            System.out.println("person = " + person);
+        }
+    }
+
+    /**
+     * 查询地址在西安市，并且年龄小于20的人
+     */
+    @Test
+    void test05(){
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.termQuery("address","西安市"));
+        boolQuery.must(QueryBuilders.rangeQuery("age").lt(20));
+
+        List<SearchHit<Person>> hitList = esRestTemplate
+                .search(new NativeSearchQuery(boolQuery), Person.class, IndexCoordinates.of("person"))
+                .getSearchHits();
+        hitList.forEach(personSearchHit -> {
+            Person person = personSearchHit.getContent();
+            System.out.println("person = " + person);
+        });
+    }
+
+    /**
+     * 查询 first 是 "张" 或者 "李" 的人
+     */
+    @Test
+    void test06(){
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.should(QueryBuilders.termQuery("first","张"));
+        boolQuery.should(QueryBuilders.termQuery("first","李"));
+
+        List<SearchHit<Person>> hitList = esRestTemplate
+                .search(new NativeSearchQuery(boolQuery), Person.class, IndexCoordinates.of("person"))
+                .getSearchHits();
+
+        for (SearchHit<Person> personSearchHit : hitList) {
+
+            Person content = personSearchHit.getContent();
+            System.out.println("content = " + content);
+        }
+    }
+
+    /**
+     * 查询地址是西安市，并且年龄小于20的人
+     */
+    @Test
+    void test07(){
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.matchQuery("address","西安市"));
+        boolQuery.must(QueryBuilders.rangeQuery("age").lt(20));
+
+        List<SearchHit<Person>> hitList = esRestTemplate
+                .search(new NativeSearchQuery(boolQuery), Person.class, IndexCoordinates.of("person"))
+                .getSearchHits();
+        for (SearchHit<Person> personSearchHit : hitList) {
+            Person content = personSearchHit.getContent();
+            System.out.println("content = " + content);
+        }
+    }
+
+    /**
+     * 查询年龄大于等于 19 且在西安市的人或 id = 1 的人
+     */
+    @Test
+    void test08(){
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.should(QueryBuilders.termQuery("id",1));
+
+        BoolQueryBuilder subBoolQuery = QueryBuilders.boolQuery();
+        subBoolQuery.must(QueryBuilders.matchQuery("address","西安市"));
+        subBoolQuery.must(QueryBuilders.rangeQuery("age").gte(19));
+
+        boolQuery.should(subBoolQuery);
+        List<SearchHit<Person>> hitList = esRestTemplate
+                .search(new NativeSearchQuery(boolQuery), Person.class, IndexCoordinates.of("person"))
+                .getSearchHits();
+        for (SearchHit<Person> personSearchHit : hitList) {
+            Person content = personSearchHit.getContent();
+            System.out.println("content = " + content);
+        }
+    }
+
 }
