@@ -23,20 +23,23 @@ spring:
 
       #所有的网关路由规则
       routes:
-        - id: product_route # 以 /admin/product 开头的所有请求都lb(loadbalancer)转给service-product
+        - id: product_route
           uri: lb://service-product
-          predicates:  #断言
+          predicates:
             - Path=/admin/product/**
-
+        - id: service-item
+          uri: lb://service-item
+          predicates:
+            - Path=/lock/incr
+        - id: service-user
+          uri: lb://service-user
+          predicates:
+            - Path=/api/user/**
         - id: web_all_route
           uri: lb://web-all
           predicates:
             - Host=**.gmall.com
 
-        - id: service-item
-          uri: lb://service-item
-          predicates:
-            - Path=/lock/incr
 
 
 
