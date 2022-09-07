@@ -5,9 +5,16 @@
     "bool": {
       "must": [
         {
-          "term": {
-            "category3Id": {
-              "value": 61,
+          "match": {
+            "title": {
+              "query": "小米",
+              "operator": "OR",
+              "prefix_length": 0,
+              "max_expansions": 50,
+              "fuzzy_transpositions": true,
+              "lenient": false,
+              "zero_terms_query": "NONE",
+              "auto_generate_synonyms_phrase_query": true,
               "boost": 1.0
             }
           }
@@ -139,5 +146,16 @@
         }
       }
     }
+  },
+  "highlight": {
+    "pre_tags": [
+      "<span style='color:red'>"
+    ],
+    "post_tags": [
+      "</span>"
+    ],
+    "fields": {
+      "title": {}
+    }
   }
-}'
+}
