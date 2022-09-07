@@ -103,21 +103,22 @@ public class GoodsServiceImpl implements GoodsService {
      * @param paramVo
      * @return
      */
-    private SearchResponseVo buildSearchResponseResult(SearchHits<Goods> goods, SearchParamVo paramVo) {
+    private SearchResponseVo buildSearchResponseResult(SearchHits<Goods> goods,
+                                                       SearchParamVo paramVo) {
         SearchResponseVo vo = new SearchResponseVo();
-        // 1、当时检索前端传来的所有参数
+        //1、当时检索前端传来的所有参数
         vo.setSearchParam(paramVo);
-        // 2、构建品牌面包屑 trademark=1:小米
-        if (!StringUtils.isEmpty(paramVo.getTrademark())){
-            vo.setTrademarkParam("品牌：" + paramVo.getTrademark().split(":")[1]);
+        //2、构建品牌面包屑 trademark=1:小米
+        if(!StringUtils.isEmpty(paramVo.getTrademark())){
+            vo.setTrademarkParam("品牌："+paramVo.getTrademark().split(":")[1]);
         }
-        // 3、平台属性面包屑
-        if (paramVo.getProps() != null && paramVo.getProps().length > 0){
-            ArrayList<SearchAttr> propsParamList = new ArrayList<>();
+        //3、平台属性面包屑
+        if(paramVo.getProps()!= null && paramVo.getProps().length>0){
+            List<SearchAttr> propsParamList = new ArrayList<>();
             for (String prop : paramVo.getProps()) {
-                // 23:8G:运行内存
+                //23:8G:运行内存
                 String[] split = prop.split(":");
-                // 一个 SearchAttr 代表一个属性面包屑
+                //一个SearchAttr 代表一个属性面包屑
                 SearchAttr searchAttr = new SearchAttr();
                 searchAttr.setAttrId(Long.parseLong(split[0]));
                 searchAttr.setAttrValue(split[1]);
@@ -127,16 +128,16 @@ public class GoodsServiceImpl implements GoodsService {
             vo.setPropsParamList(propsParamList);
         }
 
-        // 4、所有品牌列表，需要 ES 聚合分析
-        List<TrademarkVo> trademarkVos = buildTrademarkList(goods);
+        //4、所有品牌列表 。需要ES聚合分析
+        List<TrademarkVo> trademarkVos =  buildTrademarkList(goods);
         vo.setTrademarkList(trademarkVos);
-        // 5、所有属性列表，需要 ES 聚合分析
-        List<AttrVo> attrVoList = buildAttrList(goods);
-        vo.setAttrsList(attrVoList);
+        //TODO 5、所有属性列表 。需要ES聚合分析
+        List<AttrVo> attrsList = buildAttrList(goods);
+        vo.setAttrsList(attrsList);
 
-        // 为了回显
-        // 6、返回排序信息 order=1:desc
-        if (!StringUtils.isEmpty(paramVo.getOrder())){
+        //为了回显
+        //6、返回排序信息  order=1:desc
+        if(!StringUtils.isEmpty(paramVo.getOrder())){
             String order = paramVo.getOrder();
             OrderMapVo mapVo = new OrderMapVo();
             mapVo.setType(order.split(":")[0]);
@@ -144,35 +145,38 @@ public class GoodsServiceImpl implements GoodsService {
             vo.setOrderMap(mapVo);
         }
 
-        // 7、所有搜索到的商品列表
-        ArrayList<Goods> goodsList = new ArrayList<>();
+
+        //7、所有搜索到的商品列表
+        List<Goods> goodsList = new ArrayList<>();
         List<SearchHit<Goods>> hits = goods.getSearchHits();
         for (SearchHit<Goods> hit : hits) {
-            // 这条命中记录的商品
+            //这条命中记录的商品
             Goods content = hit.getContent();
-            // 如果模糊检索了，会有高亮标题
-            if (!StringUtils.isEmpty(paramVo.getKeyword())){
-                String highLightTitle = hit.getHighlightField("title").get(0);
-                // 设置高亮标题
-                content.setTitle(highLightTitle);
+            //如果模糊检索了，会有高亮标题
+            if(!StringUtils.isEmpty(paramVo.getKeyword())){
+                String highlightTitle = hit.getHighlightField("title").get(0);
+                //设置高亮标题
+                content.setTitle(highlightTitle);
             }
             goodsList.add(content);
         }
 
         vo.setGoodsList(goodsList);
 
-        // 8、页码
-        vo.setPageNo(paramVo.getPageNo());
-        // 9、总页码
-        long totalHits = goods.getTotalHits();
-        long ps = totalHits % SysRedisConst.SEARCH_PAGE_SIZE == 0 ?
-                totalHits / SysRedisConst.SEARCH_PAGE_SIZE :
-                (totalHits / SysRedisConst.SEARCH_PAGE_SIZE + 1);
-        vo.setTotalPages(Integer.valueOf(ps + ""));
 
-        // 10、老连接：/list.html?category2Id=13
+        //8、页码
+        vo.setPageNo(paramVo.getPageNo());
+        //9、总页码？
+        long totalHits = goods.getTotalHits();
+        long ps = totalHits%SysRedisConst.SEARCH_PAGE_SIZE == 0?
+                totalHits/SysRedisConst.SEARCH_PAGE_SIZE:
+                (totalHits/SysRedisConst.SEARCH_PAGE_SIZE+1);
+        vo.setTotalPages(new Integer(ps+""));
+
+        //10、老连接。。。   /list.html?category2Id=13
         String url = makeUrlParam(paramVo);
         vo.setUrlParam(url);
+
         return vo;
     }
 
@@ -410,43 +414,48 @@ public class GoodsServiceImpl implements GoodsService {
 
 
         //=========聚合分析上面DSL检索到的所有商品涉及了多少种品牌和多少种平台属性
-        // 3、品牌聚合 - 品牌聚合分析条件
+        //TODO
+        //3、品牌聚合 - 品牌聚合分析条件
         TermsAggregationBuilder tmIdAgg = AggregationBuilders
                 .terms("tmIdAgg")
                 .field("tmId")
                 .size(1000);
 
-        // 3.1 品牌聚合 - 品牌名子聚合
+
+        //3.1 品牌聚合 - 品牌名子聚合
         TermsAggregationBuilder tmNameAgg = AggregationBuilders.terms("tmNameAgg").field("tmName").size(1);
-        // 3.2 品牌聚合 - 品牌 logo 子聚合
+        //3.2 品牌聚合 - 品牌logo子聚合
         TermsAggregationBuilder tmLogoAgg = AggregationBuilders.terms("tmLogoAgg").field("tmLogoUrl").size(1);
 
         tmIdAgg.subAggregation(tmNameAgg);
         tmIdAgg.subAggregation(tmLogoAgg);
 
-        // 品牌 id 聚合条件拼装完成
+        //品牌id聚合条件拼装完成
         query.addAggregation(tmIdAgg);
 
-        // 4、属性聚合
-        // 4.1 属性的整个嵌入式聚合
+
+
+        //4、属性聚合
+        //4.1 属性的整个嵌入式聚合
         NestedAggregationBuilder attrAgg = AggregationBuilders.nested("attrAgg", "attrs");
 
-        // 4.2 attrId 聚合
+
+        //4.2 attrid 聚合
         TermsAggregationBuilder attrIdAgg = AggregationBuilders.terms("attrIdAgg").field("attrs.attrId").size(100);
 
-        // 4.3 attrName 聚合
+        //4.3 attrname 聚合
         TermsAggregationBuilder attrNameAgg = AggregationBuilders.terms("attrNameAgg").field("attrs.attrName").size(1);
 
-        // 4.4 attrValue 聚合
+        //4.4 attrvalue 聚合
         TermsAggregationBuilder attrValueAgg = AggregationBuilders.terms("attrValueAgg").field("attrs.attrValue").size(100);
 
         attrIdAgg.subAggregation(attrNameAgg);
         attrIdAgg.subAggregation(attrValueAgg);
         attrAgg.subAggregation(attrIdAgg);
 
-
-        // 添加整个属性的聚合条件
+        //添加整个属性的聚合条件
         query.addAggregation(attrAgg);
+
         return query;
     }
 }
