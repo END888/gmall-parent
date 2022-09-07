@@ -14,6 +14,7 @@ public class GmallException extends RuntimeException {
 
     @ApiModelProperty(value = "异常状态码")
     private Integer code;
+    private ResultCodeEnum codeEnum;
 
     /**
      * 通过状态码和错误消息创建异常对象

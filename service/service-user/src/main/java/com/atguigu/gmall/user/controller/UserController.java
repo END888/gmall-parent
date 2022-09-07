@@ -36,7 +36,7 @@ public class UserController {
      * @return
      */
     @GetMapping("/passport/logout")
-    public Result logout(@RequestHeader("token") String token){
+    public Result logout(@RequestHeader(value = "token") String token){
         userInfoService.logout(token);
         return Result.ok();
     }
