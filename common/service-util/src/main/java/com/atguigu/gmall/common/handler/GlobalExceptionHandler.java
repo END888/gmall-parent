@@ -2,6 +2,7 @@ package com.atguigu.gmall.common.handler;
 
 import com.atguigu.gmall.common.execption.GmallException;
 import com.atguigu.gmall.common.result.Result;
+import com.atguigu.gmall.common.result.ResultCodeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,6 +31,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(GmallException.class)
     @ResponseBody
     public Result error(GmallException e){
-        return Result.fail(e.getMessage());
+        e.printStackTrace();
+        ResultCodeEnum codeEnum = e.getCodeEnum();
+        return Result.build("",codeEnum);
     }
 }
