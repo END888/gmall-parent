@@ -58,7 +58,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
 
     @Override
     public void logout(String token) {
-        redisTemplate.delete(token);
+            redisTemplate.delete(token);
     }
 }
 
