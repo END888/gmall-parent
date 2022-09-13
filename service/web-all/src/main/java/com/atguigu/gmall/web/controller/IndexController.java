@@ -19,13 +19,17 @@ public class IndexController {
     @Autowired
     CategoryFeignClient categoryFeignClient;
 
-    @GetMapping({"/","/index"})
+    /**
+     * 跳到首页
+     * @param model
+     * @return
+     */
+    @GetMapping({"/","/index","index.html"})
     public String indexPage(Model model){
 
-        log.info("{}","访问首页啦-----------");
         // 远程查询出所有菜单，封装成一个树形结构的模型
         Result<List<CategoryTreeTo>> result = categoryFeignClient.getAllCategoryWithTree();
-        log.info("查询到的数据：{}",result);
+
         if (result.isOk()){
             // 远程成功
             List<CategoryTreeTo> data = result.getData();
