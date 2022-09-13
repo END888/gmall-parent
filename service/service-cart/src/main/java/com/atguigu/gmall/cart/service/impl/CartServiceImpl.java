@@ -3,6 +3,7 @@ import com.atguigu.gmall.cart.service.CartService;
 import com.atguigu.gmall.common.auth.AuthUtils;
 import com.atguigu.gmall.common.constant.SysRedisConst;
 import com.atguigu.gmall.common.execption.GmallException;
+import com.atguigu.gmall.common.result.Result;
 import com.atguigu.gmall.common.result.ResultCodeEnum;
 import com.atguigu.gmall.common.util.Jsons;
 import com.atguigu.gmall.feign.product.SkuProductFeignClient;
@@ -14,10 +15,13 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -29,6 +33,9 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     SkuProductFeignClient skuProductFeignClient;
+
+    @Autowired
+    ThreadPoolExecutor executor;
 
     /**
      * 添加一个商品到购物车
@@ -184,6 +191,19 @@ public class CartServiceImpl implements CartService {
                 .map(str -> Jsons.toObj(str, CartInfo.class))
                 .sorted((o1, o2) -> o2.getCreateTime().compareTo(o1.getCreateTime()))
                 .collect(Collectors.toList());
+        // 顺便把购物车中所有的商品的价格  再次查询一遍进行更新（异步不保证立即执行）
+        // 不用等价格更新，异步情况下拿不到老请求
+        // 1、老请求
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        // 【异步会导致 feign 丢失请求】
+        executor.submit(()->{
+            // 2、绑定请求到这个线程
+            RequestContextHolder.setRequestAttributes(requestAttributes);
+            updateCartAllItemPrice(cartKey,infos);
+            // 3、移除数据
+            RequestContextHolder.resetRequestAttributes();
+        });
+//        updateCartAllItemPrice(cartKey,infos);
         return infos;
     }
 
@@ -297,5 +317,24 @@ public class CartServiceImpl implements CartService {
         if (ids != null && ids.size() > 0){
             hashOps.delete(ids.toArray());
         }
+    }
+
+    @Override
+    public void updateCartAllItemPrice(String cartKey,List<CartInfo> cartInfos) {
+        BoundHashOperations<String, String, String> cartOps
+                = redisTemplate.boundHashOps(cartKey);
+        System.out.println("更新价格启动：" + Thread.currentThread());
+        // 200个商品 4s
+        cartInfos.stream()
+                .forEach(cartInfo -> {
+                    // 1、查出最新价格  15ms
+                    Result<BigDecimal> price = skuProductFeignClient.getSku1010Price(cartInfo.getSkuId());
+                    // 2、设置新价格
+                    cartInfo.setSkuPrice(price.getData());
+                    cartInfo.setUpdateTime(new Date());
+                    // 3、更新购物车价格： 5ms
+                    cartOps.put(cartInfo.getSkuId().toString(),Jsons.toStr(cartInfo));
+                });
+        System.out.println("更新价格结束：" + Thread.currentThread());
     }
 }
