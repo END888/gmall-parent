@@ -43,6 +43,14 @@ spring:
           uri: lb://service-order
           predicates:
             - Path=/api/order/**
+        - id: pay_router
+          uri: lb://service-pay
+          predicates:
+            - Path=/api/payment/**
+        - id: pay_router
+          uri: lb://service-seckill
+          predicates:
+            - Path=/api/activity/**
         - id: web_all_route
           uri: lb://web-all
           predicates:
@@ -57,7 +65,7 @@ app:
       - /img/**
       - /login.html
       - /api/user/passport/login
-
+#      - /api/order/orderSpilt
     login-auth-url: #登录以后才能访问的资源
       - /api/**/auth/**
       - /trade.html

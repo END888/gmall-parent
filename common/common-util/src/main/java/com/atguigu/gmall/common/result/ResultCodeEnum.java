@@ -32,7 +32,8 @@ public enum ResultCodeEnum {
     COUPON_LIMIT_GET(221, "优惠券已发放完毕"),
     TOKEN_INVAILD(4000,"页面已过期，请重新刷新"),
     ORDER_NO_STOCK(4001,"订单商品库存不足："),
-    ORDER_PRICE_CHANGED(4002,"订单中以下商品价格变化，请重新刷新再试；")
+    ORDER_PRICE_CHANGED(4002,"订单中以下商品价格变化，请重新刷新再试；"),
+    ORDER_EXPIRED(4003,"订单已过期，不能再进行支付")
     ;
 
     private Integer code;

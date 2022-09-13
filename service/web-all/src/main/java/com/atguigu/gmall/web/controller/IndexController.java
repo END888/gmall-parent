@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class IndexController {
      * @param model
      * @return
      */
-    @GetMapping({"/","/index","index.html"})
+    @RequestMapping({"/","/index","index.html"})
     public String indexPage(Model model){
 
         // 远程查询出所有菜单，封装成一个树形结构的模型
