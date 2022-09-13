@@ -91,4 +91,10 @@ public interface CartService {
      * @param cartKey
      */
     void deleteChecked(String cartKey);
+
+    /**
+     * 更新这个购物车中商品的价格
+     * @param cartKey
+     */
+    void updateCartAllItemPrice(String cartKey);
 }

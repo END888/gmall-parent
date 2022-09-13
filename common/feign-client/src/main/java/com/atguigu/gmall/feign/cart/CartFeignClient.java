@@ -2,10 +2,13 @@ package com.atguigu.gmall.feign.cart;
 
 
 import com.atguigu.gmall.common.result.Result;
+import com.atguigu.gmall.model.cart.CartInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @RequestMapping("/api/inner/rpc/cart")
 @FeignClient("service-cart")
@@ -27,4 +30,11 @@ public interface CartFeignClient {
      */
     @GetMapping("/deleteChecked")
     Result deleteChecked();
+
+    /**
+     * 获取当前购物车中选中的所有商品
+     * @return
+     */
+    @GetMapping("/checked/list")
+    Result<List<CartInfo>> getChecked();
 }

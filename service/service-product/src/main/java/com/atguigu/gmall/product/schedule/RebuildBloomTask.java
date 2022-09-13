@@ -4,6 +4,7 @@ import com.atguigu.gmall.product.bloom.BloomDataQueryService;
 import com.atguigu.gmall.product.bloom.BloomOpsService;
 import com.atguigu.starter.cache.constant.SysRedisConst;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,6 +24,7 @@ public class RebuildBloomTask {
      * corn 表达式：* * * * * ? *
      * 秒 分 时 日 月 周 年
      */
+    @Scheduled(cron = "0 0 3 ? * 3")
     public void rebuild(){
         System.out.println("重建测试。。。。");
         bloomOpsService.rebuildBloom(SysRedisConst.BLOOM_SKUID,bloomDataQueryService);

@@ -62,4 +62,6 @@ public class OrderDetail extends BaseEntity {
     @TableField("split_coupon_amount")
     private BigDecimal splitCouponAmount;
 
+    @TableField("user_id")
+    private Long userId;
 }
