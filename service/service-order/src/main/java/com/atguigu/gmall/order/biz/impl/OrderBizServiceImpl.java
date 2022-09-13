@@ -10,6 +10,7 @@ import com.atguigu.gmall.feign.product.SkuProductFeignClient;
 import com.atguigu.gmall.feign.user.UserFeignClient;
 import com.atguigu.gmall.feign.ware.WareFeignClient;
 import com.atguigu.gmall.model.cart.CartInfo;
+import com.atguigu.gmall.model.enums.ProcessStatus;
 import com.atguigu.gmall.model.user.UserAddress;
 import com.atguigu.gmall.model.vo.order.CartInfoVo;
 import com.atguigu.gmall.model.vo.order.OrderConfirmDataVo;
@@ -17,10 +18,10 @@ import com.atguigu.gmall.model.vo.order.OrderSubmitVo;
 import com.atguigu.gmall.model.vo.user.UserAuthInfo;
 import com.atguigu.gmall.order.biz.OrderBizService;
 import com.atguigu.gmall.order.service.OrderInfoService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -54,6 +55,12 @@ public class OrderBizServiceImpl implements OrderBizService {
 
     @Autowired
     OrderInfoService orderInfoService;
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
+    ScheduledExecutorService pool = Executors.newScheduledThreadPool(10);
+
 
     @Override
     public OrderConfirmDataVo getConfirmData() {
@@ -183,7 +190,6 @@ public class OrderBizServiceImpl implements OrderBizService {
         }
 
         if(noStockSkus.size() > 0){
-            GmallException exception = new GmallException(ResultCodeEnum.ORDER_NO_STOCK);
             String skuNames = noStockSkus.stream()
                     .reduce((s1, s2) -> s1 + " " + s2)
                     .get();
@@ -226,16 +232,29 @@ public class OrderBizServiceImpl implements OrderBizService {
         cartFeignClient.deleteChecked();
 
         //45min不支付就要关闭。
-        ScheduledExecutorService pool = Executors.newScheduledThreadPool(10);
-        pool.schedule(()->{
-            closeOrder(orderId);
-        },45,TimeUnit.MINUTES);
+        //给MQ发一个消息。说明这个订单创建成功了。
+        //只要关单失败，消费者下次启动消息还在
 
         return orderId;
     }
 
-    @Scheduled(cron = "0 */5 * * * ?")
-    public void closeOrder(Long orderId){
-
+    @Override
+    public void closeOrder(Long orderId, Long userId) {
+        ProcessStatus closed = ProcessStatus.CLOSED;
+        List<ProcessStatus> expected = Arrays.asList(ProcessStatus.UNPAID, ProcessStatus.FINISHED);
+        // 如果是未支付或者已经结束才可以关闭订单 CAS
+        orderInfoService.changeOrderStatus(orderId,userId,closed,expected);
+        /**
+         *  修改：process_status，order_status
+         *  SQL：
+         *      update order_info set
+         *          process_status=CLOSED,order_status=CLOSED
+         *      where user_id=userId and order_id=orderId and order_status IN (UNPAID,FINISHED)
+         */
     }
+
+//    @Scheduled(cron = "0 */5 * * * ?")
+//    public void closeOrder(Long orderId){
+//        System.out.println("关闭订单");
+//    }
 }
