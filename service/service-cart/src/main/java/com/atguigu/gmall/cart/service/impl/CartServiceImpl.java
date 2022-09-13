@@ -199,7 +199,7 @@ public class CartServiceImpl implements CartService {
         executor.submit(()->{
             // 2、绑定请求到这个线程
             RequestContextHolder.setRequestAttributes(requestAttributes);
-            updateCartAllItemPrice(cartKey,infos);
+            updateCartAllItemPrice(cartKey);
             // 3、移除数据
             RequestContextHolder.resetRequestAttributes();
         });
@@ -310,7 +310,7 @@ public class CartServiceImpl implements CartService {
         BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(cartKey);
 
         // 1、拿到选中的商品，并删除；收集所有选中商品的 id
-        List<String> ids = getCartList(cartKey).stream()
+        List<String> ids = getCheckedItems(cartKey).stream()
                 .map(cartInfo -> cartInfo.getSkuId().toString())
                 .collect(Collectors.toList());
 
@@ -319,22 +319,23 @@ public class CartServiceImpl implements CartService {
         }
     }
 
-    @Override
-    public void updateCartAllItemPrice(String cartKey,List<CartInfo> cartInfos) {
+    @Override //如果传入了 要更新的List，会导致延迟更新问题
+    public void updateCartAllItemPrice(String cartKey) {
         BoundHashOperations<String, String, String> cartOps
                 = redisTemplate.boundHashOps(cartKey);
         System.out.println("更新价格启动：" + Thread.currentThread());
-        // 200个商品 4s
-        cartInfos.stream()
-                .forEach(cartInfo -> {
-                    // 1、查出最新价格  15ms
-                    Result<BigDecimal> price = skuProductFeignClient.getSku1010Price(cartInfo.getSkuId());
-                    // 2、设置新价格
-                    cartInfo.setSkuPrice(price.getData());
-                    cartInfo.setUpdateTime(new Date());
-                    // 3、更新购物车价格： 5ms
-                    cartOps.put(cartInfo.getSkuId().toString(),Jsons.toStr(cartInfo));
-                });
+        cartOps.values().stream().map(str-> Jsons.toObj(str,CartInfo.class)).forEach(cartInfo -> {
+            // 1、查出最新价格   15ms
+            Result<BigDecimal> price = skuProductFeignClient.getSku1010Price(cartInfo.getSkuId());
+            // 2、设置新价格
+            cartInfo.setSkuPrice(price.getData());
+            cartInfo.setUpdateTime(new Date());
+            // 3、更新购物车价格 5ms 给购物车存数据之前做一个校验
+            // 100% 防得住
+            if (cartOps.hasKey(cartInfo.getSkuId().toString())){
+                cartOps.put(cartInfo.getSkuId().toString(),Jsons.toStr(cartInfo));
+            }
+        });
         System.out.println("更新价格结束：" + Thread.currentThread());
     }
 }
