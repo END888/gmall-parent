@@ -305,18 +305,33 @@ public class CartServiceImpl implements CartService {
      * 删除购物车中选中的商品
      * @param cartKey
      */
+//    @Override
+//    public void deleteChecked(String cartKey) {
+//        BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(cartKey);
+//
+//        // 1、拿到选中的商品，并删除；收集所有选中商品的 id
+//        List<String> ids = getCheckedItems(cartKey).stream()
+//                .map(cartInfo -> cartInfo.getSkuId().toString())
+//                .collect(Collectors.toList());
+//
+//        if (ids != null && ids.size() > 0){
+//            hashOps.delete(ids.toArray());
+//        }
+//    }
     @Override
     public void deleteChecked(String cartKey) {
         BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(cartKey);
 
         // 1、拿到选中的商品，并删除；收集所有选中商品的 id
-        List<String> ids = getCheckedItems(cartKey).stream()
-                .map(cartInfo -> cartInfo.getSkuId().toString())
-                .collect(Collectors.toList());
 
-        if (ids != null && ids.size() > 0){
+        List<String> ids = hashOps.values()
+                .stream()
+                .map(str -> Jsons.toObj(str, CartInfo.class).getSkuId().toString())
+                .collect(Collectors.toList());
+        if (ids != null || ids.size() > 0){
             hashOps.delete(ids.toArray());
         }
+
     }
 
     @Override //如果传入了 要更新的List，会导致延迟更新问题
