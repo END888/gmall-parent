@@ -1,7 +1,12 @@
 package com.atguigu.gmall.order.biz;
 
+
 import com.atguigu.gmall.model.vo.order.OrderConfirmDataVo;
 import com.atguigu.gmall.model.vo.order.OrderSubmitVo;
+import com.atguigu.gmall.model.vo.order.OrderWareMapVo;
+import com.atguigu.gmall.model.vo.order.WareChildOrderVo;
+
+import java.util.List;
 
 /**
  * 订单业务
@@ -13,7 +18,6 @@ public interface OrderBizService {
      * @return
      */
     OrderConfirmDataVo getConfirmData();
-
 
     /**
      * 生成交易流水号。
@@ -28,7 +32,6 @@ public interface OrderBizService {
      */
     boolean checkTradeNo(String tradeNo);
 
-
     /**
      * 提交订单
      * @param submitVo
@@ -42,4 +45,11 @@ public interface OrderBizService {
      * @param userId
      */
     void closeOrder(Long orderId, Long userId);
+
+    /**
+     * 拆单
+     * @param params
+     * @return
+     */
+    List<WareChildOrderVo> orderSplit(OrderWareMapVo params);
 }

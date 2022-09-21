@@ -1,6 +1,7 @@
 package com.atguigu.gmall.rabbit;
 
 
+import com.atguigu.gmall.service.RabbitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
@@ -49,5 +50,11 @@ public class AppRabbitConfiguration {
 //        data.setId("aa");
 //        template.convertAndSend("xx","sss","aa",data);
         return template;
+    }
+
+    //    @ConditionalOnBean(StringRedisTemplate.class)  //容器中有redis才需要再加入 RabbitService
+    @Bean
+    RabbitService rabbitService(){
+        return new RabbitService();
     }
 }

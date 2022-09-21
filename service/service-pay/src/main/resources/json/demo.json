@@ -1,0 +1,9 @@
+{
+  "alipay_trade_create_response": {
+    "code": "10000",
+    "msg": "Success",
+    "out_trade_no": "202209162117308079551",
+    "trade_no": "2022091622001453030502094201"
+  },
+  "sign": "ShlVbk8dQKhXSp6cQrH0ozLvkrRfSmozG9FergMp5KebYhEnONoqZ8e4j6GCJJG1m6GhwMDUObVJGHSyTxELz6wu8vY1XY6r8tfdVu7LdOUGQqmJ33fSzX8iKlJpmiOo/W35DNububZktuRTecKaj+LHPRSOpUfU9vtECC5JuvW5mLMJsn5itwnNefz94umRLOmf+8kyIwKgyGnvujcZhD/Sx6z2mJNhmDe1JDZ4KRKMyaNnqyJ/iJcjTbM7VZoVi7f8+sGGV5nk5PmCEF2z851iHaB//sFr0mRbPgEhlPn/W4GDf47CqtMQ6/3kTZO5ppIvRxyWhGuFhlw7l4afyA=="
+}

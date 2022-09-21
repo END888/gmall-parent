@@ -1,0 +1,26 @@
+server:
+  port: 15001
+
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.200.100:3306/gmall_activity?useSSL=false
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+    type: com.zaxxer.hikari.HikariDataSource
+  rabbitmq:
+    username: admin
+    password: admin
+    host: 192.168.200.100
+    port: 5672
+    virtual-host: /
+    publisher-returns: true #发布者返回（消息成功标志）
+    publisher-confirm-type: simple #开启发布者简单确认机制
+    listener:
+      type: simple
+      simple:
+        acknowledge-mode: manual #开启手动确认机制，除非程序员自己 ack，否则服务器都认为消息还未回复
+        batch-size: 12
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

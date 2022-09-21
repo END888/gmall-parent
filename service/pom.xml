@@ -16,6 +16,8 @@
         <module>service-user</module>
         <module>service-cart</module>
         <module>service-order</module>
+        <module>service-pay</module>
+        <module>service-seckill</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
 

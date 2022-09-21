@@ -40,4 +40,10 @@ public class PayController {
         return "payment/error";
 
     }
+
+    @GetMapping("/pay/success.html")
+    public String paySuccessPage(){
+
+        return "payment/success";
+    }
 }

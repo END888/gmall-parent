@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
 @Slf4j
 @Component
 public class MQListener {
+
 
 
     //Map搬到redis。 counter:  value(id - count)
@@ -46,3 +46,4 @@ public class MQListener {
         }
     }
 }
+
