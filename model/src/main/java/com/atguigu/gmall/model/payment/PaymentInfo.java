@@ -22,9 +22,9 @@ import java.util.Date;
 @ApiModel(description = "支付信息")
 @TableName("payment_info")
 public class PaymentInfo extends BaseEntity {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	@ApiModelProperty(value = "对外业务编号")
 	@TableField("out_trade_no")
 	private String outTradeNo;
@@ -32,6 +32,9 @@ public class PaymentInfo extends BaseEntity {
 	@ApiModelProperty(value = "订单编号")
 	@TableField("order_id")
 	private Long orderId;
+
+	@TableField("user_id")
+	private Long userId;
 
 	@ApiModelProperty(value = "支付类型（微信 支付宝）")
 	@TableField("payment_type")
@@ -66,4 +69,3 @@ public class PaymentInfo extends BaseEntity {
 	private String callbackContent;
 
 }
-

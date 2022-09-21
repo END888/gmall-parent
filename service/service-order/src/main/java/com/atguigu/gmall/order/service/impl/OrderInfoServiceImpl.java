@@ -13,6 +13,7 @@ import com.atguigu.gmall.model.vo.order.OrderSubmitVo;
 import com.atguigu.gmall.order.mapper.OrderInfoMapper;
 import com.atguigu.gmall.order.service.OrderDetailService;
 import com.atguigu.gmall.order.service.OrderInfoService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     @Autowired
     RabbitTemplate rabbitTemplate;
 
-    @Transactional
+    @Transactional //数据库成功 + 消息成功
     @Override
     public Long saveOrder(OrderSubmitVo submitVo,String tradeNo) {
         //1、准备订单数据
@@ -55,26 +56,66 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         List<OrderDetail> details = prepareOrderDetail(submitVo,orderInfo);
         orderDetailService.saveBatch(details);
 
-        // 发送订单创建完成消息
-        OrderMsg orderMsg = new OrderMsg(orderInfo.getId(), orderInfo.getUserId());
+        //发送订单创建完成消息
+        OrderMsg orderMsg = new OrderMsg(orderInfo.getId(),orderInfo.getUserId());
         rabbitTemplate.convertAndSend(
                 MqConst.EXCHANGE_ORDER_EVNT,
                 MqConst.RK_ORDER_CREATED,
                 Jsons.toStr(orderMsg)
         );
 
+
+
         //3、返回订单id
         return orderInfo.getId();
     }
 
+    @Transactional
     @Override
-    public void changeOrderStatus(Long orderId, Long userId, ProcessStatus closed, List<ProcessStatus> expected) {
+    public void changeOrderStatus(Long orderId, Long userId,
+                                  ProcessStatus closed,
+                                  List<ProcessStatus> expected) {
         String orderStatus = closed.getOrderStatus().name();
         String processStatus = closed.name();
-        List<String> expects = expected.stream().map(Enum::name).collect(Collectors.toList());
 
-        // 幂等性修改订单
+        List<String> expects = expected.stream().map(status -> status.name()).collect(Collectors.toList());
+
+        //幂等修改订单
         orderInfoMapper.updateOrderStatus(orderId,userId,processStatus,orderStatus,expects);
+    }
+
+    @Override
+    public OrderInfo getOrderInfoByOutTradeNoAndUserId(String outTradeNo, Long userId) {
+        LambdaQueryWrapper<OrderInfo> wrapper = new LambdaQueryWrapper<OrderInfo>()
+                .eq(OrderInfo::getUserId, userId)
+                .eq(OrderInfo::getOutTradeNo, outTradeNo);
+        OrderInfo info = orderInfoMapper.selectOne(wrapper);
+        return info;
+    }
+
+    @Override
+    public OrderInfo getOrderInfoByOrderIdAndUserId(Long orderId, Long userId) {
+        LambdaQueryWrapper<OrderInfo> wrapper = new LambdaQueryWrapper<OrderInfo>()
+                .eq(OrderInfo::getUserId, userId)
+                .eq(OrderInfo::getId, orderId);
+        OrderInfo info = orderInfoMapper.selectOne(wrapper);
+        return info;
+    }
+
+    @Override
+    public Long submitSeckillOrder(OrderInfo info) {
+
+        // 1、保存秒杀单
+        orderInfoMapper.insert(info);
+        Long id = info.getId();
+
+        // 2、保存明细
+        List<OrderDetail> list = info.getOrderDetailList();
+        list.stream().forEach(item->{
+            item.setOrderId(id);
+        });
+        orderDetailService.saveBatch(list);
+        return id;
     }
 
     /**
