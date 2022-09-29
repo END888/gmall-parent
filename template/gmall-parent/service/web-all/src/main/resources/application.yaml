@@ -1,0 +1,15 @@
+server:
+  port: 7001
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+
+
+

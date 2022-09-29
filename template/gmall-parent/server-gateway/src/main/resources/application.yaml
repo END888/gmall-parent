@@ -1,0 +1,84 @@
+#application.yaml的优先级低，项目刚一启动并不能读取
+#bootstrap.properties/yaml
+server:
+  port: 80
+
+#配置链路追踪地址
+spring:
+  zipkin:
+    base-url: http://192.168.200.100:9411/
+    sender:
+      type: web
+
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]': #只要有人处理请求了，这个跨域就能生效
+            allowedOrigins: "*" #允许所有地址来源跨域
+            allowedMethods: "*" #允许所有请求方式跨域
+            allowedHeaders: "*" #复杂跨域的原因就是因为带来一些复杂的请求头导致，
+            allowCredentials: true #允许带一些安全标致跨域 比如：Cookie
+
+
+      #所有的网关路由规则
+      routes:
+        - id: product_route # 以 /admin/product 开头的所有请求都lb(loadbalancer)转给service-product
+          uri: lb://service-product
+          predicates:  #断言
+            - Path=/admin/product/**
+
+
+        - id: incr_route
+          uri: lb://service-item
+          predicates:
+            - Path=/lock/incr
+
+        - id: user_route
+          uri: lb://service-user
+          predicates:
+            - Path=/api/user/**
+
+        - id: cart_router
+          uri: lb://service-cart
+          predicates:
+            - Path=/api/cart/**
+
+        - id: order_router
+          uri: lb://service-order
+          predicates:
+            - Path=/api/order/**
+
+        - id: pay_router
+          uri: lb://service-pay
+          predicates:
+            - Path=/api/payment/**
+
+        - id: seckill_router
+          uri: lb://service-seckill
+          predicates:
+            - Path=/api/activity/**
+
+        - id: web_all_route
+          uri: lb://web-all
+          predicates:
+            - Host=**.gmall.com
+
+
+
+app:
+  auth:
+    no-auth-url:  #任意人无需登录都能访问的路径
+      - /css/**
+      - /js/**
+      - /img/**
+      - /login.html
+      - /api/user/passport/login
+
+    login-auth-url: #登录以后才能访问的资源
+      - /api/**/auth/**
+      - /trade.html
+    deny-url:
+      - /api/inner/**
+
+    login-page: http://passport.gmall.com/login.html

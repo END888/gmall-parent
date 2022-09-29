@@ -1,0 +1,98 @@
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"term": {
+          "category2Id": {
+            "value": 61
+          }
+        }},
+        {"term": {
+          "tmId": {
+            "value": 4
+          }
+        }},
+        {"nested": {
+          "path": "attrs",
+          "query": {
+            "bool": {
+              "must": [
+                {"term": {
+                  "attrs.attrId": {
+                    "value": 4
+                  }
+                }},
+                {"term": {
+                  "attrs.attrValue": {
+                    "value": "128GB"
+                  }
+                }}
+              ]
+            }
+          }
+        }},
+        {"match": {
+          "title": "小米"
+        }}
+      ]
+    }
+  },
+  "sort": [
+    {
+      "price": {
+        "order": "asc"
+      }
+    }
+  ],
+  "from": 0,
+  "size": 8,
+  "aggs": {
+    "tmIdAgg": {
+      "terms": {
+        "field": "tmId",
+        "size": 1000
+      },
+      "aggs": {
+        "tmNameAgg": {
+          "terms": {
+            "field": "tmName",
+            "size": 1
+          }
+        },
+        "tmLogoAgg": {
+          "terms": {
+            "field": "tmLogoUrl",
+            "size": 1
+          }
+        }
+      }
+    },
+    "attrAgg": {
+      "nested": {
+        "path": "attrs"
+      },
+      "aggs": {
+        "attrIdAgg": {
+          "terms": {
+            "field": "attrs.attrId",
+            "size": 100
+          },
+          "aggs": {
+            "attrNameAgg": {
+              "terms": {
+                "field": "attrs.attrName",
+                "size": 1
+              }
+            },
+            "attrValueAgg": {
+              "terms": {
+                "field": "attrs.attrValue",
+                "size": 100
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
